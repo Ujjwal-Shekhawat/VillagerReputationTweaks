@@ -1,0 +1,7 @@
+name: VillagerReputationTweaks
+version: 1.0.0-alpha
+main: com.kami.VillagerReputationTweaks
+description: Gives several options for tweaking how villager reputations are managed for players on servers.
+author: Kamisama
+website: https://github.com/Ujjwal-Shekhawat
+api-version: '1.21.4'
