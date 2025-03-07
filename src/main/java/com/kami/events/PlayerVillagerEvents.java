@@ -3,7 +3,6 @@ package com.kami.events;
 import com.destroystokyo.paper.entity.villager.Reputation;
 import com.destroystokyo.paper.entity.villager.ReputationType;
 import com.destroystokyo.paper.utils.PaperPluginLogger;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -38,7 +37,7 @@ public class PlayerVillagerEvents implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().sendMessage(Component.text("Hallo, " + event.getPlayer().getName() + "!"));
+        event.getPlayer().sendMessage("Hallo, " + event.getPlayer().getName() + "!");
         PaperPluginLogger.getLogger(plugin.getName()).info("Player Joined the server");
     }
 
