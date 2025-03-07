@@ -23,11 +23,13 @@ dependencies {
 tasks.register<Jar>("paper") {
     archiveFileName.set("${project.name}-paper-${project.version}.jar")
     destinationDirectory.set(layout.buildDirectory.dir("paper"))
+    from("src/main/resources")
 }
 
 tasks.register<Jar>("purpur") {
     archiveFileName.set("${project.name}-purpur-${project.version}.jar")
     destinationDirectory.set(layout.buildDirectory.dir("purpur"))
+    from("src/main/resources")
 }
 
 tasks.register("buildAll") {
