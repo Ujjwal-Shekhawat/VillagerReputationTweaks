@@ -26,23 +26,3 @@ tasks.processResources {
     }
 }
 
-tasks.register<Jar>("paper") {
-    archiveFileName.set("${project.name}-paper-${project.version}.jar")
-    destinationDirectory.set(layout.buildDirectory.dir("paper"))
-    from(sourceSets.main.get().output)
-}
-
-tasks.register<Jar>("purpur") {
-    archiveFileName.set("${project.name}-purpur-${project.version}.jar")
-    destinationDirectory.set(layout.buildDirectory.dir("purpur"))
-    from(sourceSets.main.get().output)
-}
-
-tasks.register("buildAll") {
-    dependsOn("paper", "purpur")
-    group = "build"
-    description = "Builds both Paper and Purpur JARs."
-    doLast {
-        delete(layout.buildDirectory.dir("tmp"))
-    }
-}
