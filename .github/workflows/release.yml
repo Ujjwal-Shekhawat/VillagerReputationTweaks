@@ -33,9 +33,6 @@ jobs:
       - name: Build with Gradle
         run: gradle clean build
 
-      - name: List Build Directory
-        run: ls -la build/*/**
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
