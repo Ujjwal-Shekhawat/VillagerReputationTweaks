@@ -22,6 +22,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
+      - name: Install Spigot using BuildTools
+        run: |
+          mkdir spigot_build && cd spigot_build
+          curl -o BuildTools.jar https://download.getbukkit.org/spigot/BuildTools.jar
+          java -jar BuildTools.jar --rev 1.21.4
+          cd ..
+        shell: bash
+
       - name: Build with Gradle
         run: gradle clean build
 
