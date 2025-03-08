@@ -33,7 +33,7 @@ tasks.processResources {
 }
 
 tasks.named<Jar>("jar") {
-    archiveFileName.set("${rootProject.name}-#{project.name}--${project.version}.jar")
+    archiveFileName.set("${rootProject.name}-${project.name}-${project.version}.jar")
 }
 
 // https://stackoverflow.com/questions/64290545/task-preparekotlinbuildscriptmodel-not-found-in-project-app
