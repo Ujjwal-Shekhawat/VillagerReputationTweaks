@@ -25,7 +25,7 @@ jobs:
       - name: Install Spigot using BuildTools
         run: |
           mkdir spigot_build && cd spigot_build
-          curl -o BuildTools.jar https://download.getbukkit.org/spigot/BuildTools.jar
+          wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
           java -jar BuildTools.jar --rev 1.21.4
           cd ..
         shell: bash
