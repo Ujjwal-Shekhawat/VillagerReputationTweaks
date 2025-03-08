@@ -33,7 +33,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: build/*/*.jar
+          files: ./*/*/*.jar
           body: "Automated release for ${{ github.ref_name }}"
           token: ${{ secrets.PAT_TOKEN }}
           draft: false
