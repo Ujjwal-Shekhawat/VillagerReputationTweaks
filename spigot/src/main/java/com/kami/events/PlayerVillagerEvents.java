@@ -1,6 +1,8 @@
 package com.kami.events;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.entity.npc.EntityVillager;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_21_R3.entity.CraftVillager;
@@ -14,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -89,6 +92,59 @@ public class PlayerVillagerEvents implements Listener {
 
             // Log NBT Data
             plugin.getLogger().log(Level.INFO, "Villager NBT Data: " + nbtTag);
+
+            Set<String> whatsThis = nbtTag.e();
+
+            for (String s : whatsThis) {
+                if (s.equalsIgnoreCase("Gossips")) {
+                    plugin.getLogger().info(s);
+
+                    // This printed out the compund value
+                    String somethingFinally = nbtTag.c(s).u_();
+
+
+                    plugin.getLogger().info(somethingFinally);
+
+                    // This gets type
+                    plugin.getLogger().info(nbtTag.c(s).c().a());
+                    // This gets alternate type?
+                    plugin.getLogger().info(nbtTag.c(s).c().b());
+
+                    plugin.getLogger().info(nbtTag.c(s).getClass().descriptorString());
+
+                    plugin.getLogger().info(nbtTag.p(s).getClass().descriptorString());
+
+                    // Inferred this cast from above two logs
+                    NBTTagList gossipList = (NBTTagList) nbtTag.c(s);
+
+                    plugin.getLogger().info("Logging NbtTagList" + gossipList.size());
+                    for (int i = 0; i < gossipList.size(); i++) {
+                        NBTTagCompound compound = gossipList.a(i);
+                        Set<String> gossipData = compound.e();
+                        for (String gd : gossipData) {
+                            plugin.getLogger().info(gd + ":" + compound.c(gd).u_());
+                            if (compound.c(gd) instanceof NBTTagInt) {
+                                plugin.getLogger().info("Instance of NBTTagInt");
+                                compound.a(gd, 50);
+                                plugin.getLogger().info("Tried to modify the value here:");
+                                plugin.getLogger().info(gd + ":" + compound.c(gd).u_());
+                            } else {
+                                plugin.getLogger().info("Instance of " + compound.c(gd).getClass().descriptorString());
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            plugin.getLogger().info("Trying to save NBTData now");
+            nmsVillager.a(nbtTag);
+
+            NBTTagCompound newNbtTag = new NBTTagCompound();
+            nmsVillager.saveWithoutId(newNbtTag, true); // Save villager NBT data
+
+            plugin.getLogger().log(Level.INFO, "Villager New NBT Data: " + newNbtTag);
 
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to get Villager NBT Data!", e);
