@@ -3,6 +3,7 @@ build/
 !.mvn/wrapper/maven-wrapper.jar
 !paper/src/main/**/target/
 !paper/src/test/**/target/
+paper/run/
 .gradle/
 gradle/
 gradlew*
