@@ -1,11 +1,8 @@
 package com.kami.events;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.entity.npc.EntityVillager;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_21_R3.entity.CraftVillager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -16,9 +13,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.logging.Level;
 
 /**
  * TODO:
@@ -48,7 +46,24 @@ public class PlayerVillagerEvents implements Listener {
         Entity entity = event.getRightClicked();
         if (entity instanceof Villager villager) {
             event.getPlayer().sendMessage("You interacted with: ", entity.getName());
-            logVillagerNBT(villager);
+            Optional<OfflinePlayer> bestReputationPLayer = Arrays.stream(Bukkit.getOfflinePlayers()).max(Comparator.comparingInt(e -> villager.getReputation(e.getUniqueId(), Villager.ReputationType.MAJOR_POSITIVE)));
+            bestReputationPLayer.ifPresentOrElse(
+                    player -> {
+                        if (player.getUniqueId() == event.getPlayer().getUniqueId()) return;
+
+                        int majorRep = villager.getReputation(player.getUniqueId(), Villager.ReputationType.MAJOR_POSITIVE);
+                        int minorRep = villager.getReputation(player.getUniqueId(), Villager.ReputationType.MINOR_POSITIVE);
+                        int majorRepN = villager.getReputation(player.getUniqueId(), Villager.ReputationType.MAJOR_NEGATIVE);
+                        int minorRepN = villager.getReputation(player.getUniqueId(), Villager.ReputationType.MINOR_NEGATIVE);
+
+                        villager.setReputation(event.getPlayer().getUniqueId(), Villager.ReputationType.MAJOR_POSITIVE, majorRep);
+                        villager.setReputation(event.getPlayer().getUniqueId(), Villager.ReputationType.MINOR_POSITIVE, minorRep);
+                        villager.setReputation(event.getPlayer().getUniqueId(), Villager.ReputationType.MAJOR_NEGATIVE, majorRepN);
+                        villager.setReputation(event.getPlayer().getUniqueId(), Villager.ReputationType.MINOR_NEGATIVE, minorRepN);
+                    },
+                    () -> {
+                    }
+            );
         }
     }
 
@@ -77,77 +92,6 @@ public class PlayerVillagerEvents implements Listener {
             config.save(file);
         } catch (IOException e) {
             plugin.getLogger().severe("Failed to save " + plugin.getName() + " config file");
-        }
-    }
-
-    private void logVillagerNBT(Villager villager) {
-        try {
-            // Convert Bukkit Villager to NMS Villager
-            CraftVillager craftVillager = (CraftVillager) villager;
-            EntityVillager nmsVillager = (EntityVillager) craftVillager.getHandle();
-
-            // Create NBT tag compound
-            NBTTagCompound nbtTag = new NBTTagCompound();
-            nmsVillager.saveWithoutId(nbtTag, true); // Save villager NBT data
-
-            // Log NBT Data
-            plugin.getLogger().log(Level.INFO, "Villager NBT Data: " + nbtTag);
-
-            Set<String> whatsThis = nbtTag.e();
-
-            for (String s : whatsThis) {
-                if (s.equalsIgnoreCase("Gossips")) {
-                    plugin.getLogger().info(s);
-
-                    // This printed out the compund value
-                    String somethingFinally = nbtTag.c(s).u_();
-
-
-                    plugin.getLogger().info(somethingFinally);
-
-                    // This gets type
-                    plugin.getLogger().info(nbtTag.c(s).c().a());
-                    // This gets alternate type?
-                    plugin.getLogger().info(nbtTag.c(s).c().b());
-
-                    plugin.getLogger().info(nbtTag.c(s).getClass().descriptorString());
-
-                    plugin.getLogger().info(nbtTag.p(s).getClass().descriptorString());
-
-                    // Inferred this cast from above two logs
-                    NBTTagList gossipList = (NBTTagList) nbtTag.c(s);
-
-                    plugin.getLogger().info("Logging NbtTagList" + gossipList.size());
-                    for (int i = 0; i < gossipList.size(); i++) {
-                        NBTTagCompound compound = gossipList.a(i);
-                        Set<String> gossipData = compound.e();
-                        for (String gd : gossipData) {
-                            plugin.getLogger().info(gd + ":" + compound.c(gd).u_());
-                            if (compound.c(gd) instanceof NBTTagInt) {
-                                plugin.getLogger().info("Instance of NBTTagInt");
-                                compound.a(gd, 50);
-                                plugin.getLogger().info("Tried to modify the value here:");
-                                plugin.getLogger().info(gd + ":" + compound.c(gd).u_());
-                            } else {
-                                plugin.getLogger().info("Instance of " + compound.c(gd).getClass().descriptorString());
-                            }
-                        }
-                    }
-
-
-                }
-            }
-
-            plugin.getLogger().info("Trying to save NBTData now");
-            nmsVillager.a(nbtTag);
-
-            NBTTagCompound newNbtTag = new NBTTagCompound();
-            nmsVillager.saveWithoutId(newNbtTag, true); // Save villager NBT data
-
-            plugin.getLogger().log(Level.INFO, "Villager New NBT Data: " + newNbtTag);
-
-        } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to get Villager NBT Data!", e);
         }
     }
 }
