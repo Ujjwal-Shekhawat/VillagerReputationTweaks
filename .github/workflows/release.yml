@@ -22,18 +22,26 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
+      - name: Install Spigot using BuildTools
+        run: |
+          mkdir spigot_build && cd spigot_build
+          wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+          java -jar BuildTools.jar --rev 1.21.4
+          cd ..
+        shell: bash
+
       - name: Build with Gradle
         run: gradle clean build
 
       - name: List Build Directory
-        run: ls -la build/*/**
+        run: ls -la */**/libs/*.jar
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: build/*/*.jar
+          files: ./*/**/libs/*.jar
           body: "Automated release for ${{ github.ref_name }}"
           token: ${{ secrets.PAT_TOKEN }}
           draft: false

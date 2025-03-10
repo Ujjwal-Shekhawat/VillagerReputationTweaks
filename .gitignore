@@ -1,8 +1,8 @@
 target/
 build/
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+!paper/src/main/**/target/
+!paper/src/test/**/target/
 .gradle/
 gradle/
 gradlew*
@@ -33,8 +33,8 @@ gradlew*
 /nbdist/
 /.nb-gradle/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+!paper/src/main/**/build/
+!paper/src/test/**/build/
 
 ### VS Code ###
 .vscode/
