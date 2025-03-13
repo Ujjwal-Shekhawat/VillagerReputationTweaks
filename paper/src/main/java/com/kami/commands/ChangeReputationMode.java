@@ -60,7 +60,12 @@ public class ChangeReputationMode implements CommandExecutor {
 
     private void handleGet(Player player) {
         ConfigEnumTypes tradeMode = villagerReputationTweaksConfig.getTradeMode();
-        player.sendMessage(Component.text("Reputation mode: " + tradeMode).color(NamedTextColor.GREEN));
+        boolean isEnabled = villagerReputationTweaksConfig.isEnabled();
+        if (isEnabled) {
+            player.sendMessage(Component.text("Reputation mode: " + tradeMode).color(NamedTextColor.GREEN));
+        } else {
+            player.sendMessage(Component.text("Plugin is disabled.\nrun /trademode toggle to enable it.").color(NamedTextColor.GREEN));
+        }
     }
 
     private void handleSet(String[] args, Player player, Command command) {
