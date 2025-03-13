@@ -5,3 +5,8 @@ description: Gives several options for tweaking how villager reputations are man
 author: Kamisama
 website: https://github.com/Ujjwal-Shekhawat
 api-version: ${minecraft_version}
+
+# Commands used by this
+commands:
+  trademode:
+    description: "Get the trademode used on server"

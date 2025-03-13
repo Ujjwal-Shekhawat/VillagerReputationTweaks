@@ -1,0 +1,5 @@
+enabled: true
+
+reputation-type:
+  trade-mode: "best-trades" # Default "best-trades". Other configurations "shared-trades", "one-time-trades", "worst-trades"
+
