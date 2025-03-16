@@ -116,10 +116,10 @@ public class ChangeReputationMode implements CommandExecutor {
         boolean adding = args[1].equals("add");
 
         if (adding) {
-            targetPlayer.addAttachment(plugin, permissionName, true);
+            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + player.getName() + " permission set kami.sama");
             player.sendMessage(Component.text("Added player to admin list").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC));
         } else {
-            targetPlayer.getEffectivePermissions().stream().filter(e -> e.getPermission().equals(permissionName)).findFirst().ifPresent(p -> targetPlayer.removeAttachment(p.getAttachment()));
+            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + player.getName() + " permission unset kami.sama");
             player.sendMessage(Component.text("Removed player from admin list").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC));
         }
     }
