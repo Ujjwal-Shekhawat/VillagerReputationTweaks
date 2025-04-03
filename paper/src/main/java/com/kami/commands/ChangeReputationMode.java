@@ -26,24 +26,25 @@ public class ChangeReputationMode implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        // Setup the command. I really hate the plugin.yml method
-        command.setDescription("Gets the trademode currently being used on the server, thanks");
-        command.setUsage("/trademode get | set <best-trades|worst-trades|shared-trades|one-time-trades> | reload | toggle | admin <add|remove> <player_name>");
-        command.setPermission(permissionName);
 
         if (sender instanceof Player player) {
             boolean higherPrivilege = player.isOp() || player.hasPermission(permissionName);
-            if (!higherPrivilege) {
-                player.sendMessage(Component.text("You do not have permission to use this command").color(NamedTextColor.RED));
-                return true;
-            }
 
             if (args.length == 0) {
                 return false;
             }
 
+            if (args.length == 1 && args[0].equalsIgnoreCase("get")) {
+                handleGet(player);
+                return true;
+            }
+
+            if (!higherPrivilege) {
+                player.sendMessage(Component.text("You do not have permission to use this command").color(NamedTextColor.RED));
+                return true;
+            }
+
             switch (args[0]) {
-                case "get" -> handleGet(player);
                 case "set" -> handleSet(args, player, command);
                 case "reload" -> handleReload(player);
                 case "toggle" -> handleToggle(player);
@@ -116,10 +117,18 @@ public class ChangeReputationMode implements CommandExecutor {
         boolean adding = args[1].equals("add");
 
         if (adding) {
-            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + player.getName() + " permission set kami.sama");
+            boolean success = Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + player.getName() + " permission set kami.sama");
+            if (!success) {
+                player.sendMessage("Luckperms is not installed on this server please install luckperms for this command to work");
+                return;
+            }
             player.sendMessage(Component.text("Added player to admin list").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC));
         } else {
-            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + player.getName() + " permission unset kami.sama");
+            boolean success = Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "lp user " + player.getName() + " permission unset kami.sama");
+            if (!success) {
+                player.sendMessage("Luckperms is not installed on this server please install luckperms for this command to work");
+                return;
+            }
             player.sendMessage(Component.text("Removed player from admin list").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC));
         }
     }

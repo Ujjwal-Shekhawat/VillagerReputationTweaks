@@ -9,4 +9,11 @@ api-version: ${minecraft_version}
 # Commands used by this
 commands:
   trademode:
-    description: "Get the trademode used on server"
+    description: "Gets the trade mode currently being used on the server"
+    usage: "/trademode get | set <best-trades|worst-trades|shared-trades|one-time-trades> | reload | toggle | admin <add|remove> <player_name>"
+
+permissions:
+  kami.sama:
+    description: "Allows usage of trademode command"
+    default: op
+

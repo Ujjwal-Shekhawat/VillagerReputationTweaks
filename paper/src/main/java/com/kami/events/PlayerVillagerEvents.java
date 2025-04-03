@@ -6,6 +6,7 @@ import com.kami.config.VillagerReputationTweaksConfig;
 import com.kami.utils.ConfigEnumTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
@@ -15,12 +16,15 @@ import org.bukkit.entity.Villager;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,7 +103,16 @@ public class PlayerVillagerEvents implements Listener {
                         if (player.getUniqueId() == entry.getKey()) {
                             return;
                         }
-                        villager.setReputation(player.getUniqueId(), entry.getValue());
+                        Reputation reputation = entry.getValue();
+                        if (Arrays.stream(ReputationType.values()).map(reputation::getReputation).reduce(Integer::sum).orElse(0) == 0) {
+                            return;
+                        }
+                        for (ReputationType value : ReputationType.values()) {
+                            if (reputation.getReputation(value) == 0) {
+                                reputation.setReputation(value, 0);
+                            }
+                        }
+                        villager.setReputation(player.getUniqueId(), reputation);
                     }, () -> {
                     }
             );
@@ -110,14 +123,14 @@ public class PlayerVillagerEvents implements Listener {
 
     @EventHandler
     public void villagerCuringEvent(EntityTransformEvent event) {
-        if (event.getEntity() instanceof ZombieVillager && event.getTransformReason() == EntityTransformEvent.TransformReason.CURED) {
+        if (event.getEntity() instanceof ZombieVillager && event.getTransformReason() == EntityTransformEvent.TransformReason.CURED && villagerReputationTweaksConfig.getTradeMode() == ConfigEnumTypes.ONE_TIME_TRADES) {
             Villager villager = (Villager) event.getTransformedEntity();
 
             OfflinePlayer curingPlayer = ((ZombieVillager) event.getEntity()).getConversionPlayer();
 
             if (curingPlayer != null) {
                 Reputation curingPlayerReputation = villager.getReputation(curingPlayer.getUniqueId());
-                Bukkit.getOnlinePlayers().forEach(p -> villager.setReputation(p.getUniqueId(), curingPlayerReputation));
+                Arrays.stream(Bukkit.getOfflinePlayers()).forEach(p -> villager.setReputation(p.getUniqueId(), curingPlayerReputation));
 
                 PersistentDataContainer villagerPDC = villager.getPersistentDataContainer();
                 NamespacedKey oneTimeKey = NamespacedKey.fromString("beneficiaries", plugin);
@@ -134,6 +147,21 @@ public class PlayerVillagerEvents implements Listener {
             }
         }
     }
+
+//    @EventHandler
+//    public void PlayerVillagerHitEvent(EntityDamageByEntityEvent event) {
+//        if (event.getDamager() instanceof Player player && event.getEntity() instanceof Villager villager) {
+//            player.sendMessage(Component.text("You killed a villager").color(NamedTextColor.BLACK).decorate(TextDecoration.BOLD));
+//            villager.setHealth(0.0d);
+//        }
+//    }
+//
+//    @EventHandler
+//    public void villagerDeathEvent(EntityDeathEvent event) {
+//        if (event.getEntity() instanceof Villager villager) {
+//            plugin.getLogger().warning("Event Damage source: " + event.getDamageSource());
+//        }
+//    }
 
     private Optional<Map.Entry<UUID, Reputation>> getBestTrades(Map<UUID, Reputation> reps) {
         // Formula reference from https://minecraft.fandom.com/wiki/Villager#Gossiping
@@ -173,8 +201,8 @@ public class PlayerVillagerEvents implements Listener {
         Arrays.stream(ReputationType.values()).forEach(repType -> {
             double avgValue = reps.entrySet().stream()
                     .filter(e -> Bukkit.getOfflinePlayer(e.getKey()).hasPlayedBefore())
-                    .filter(e -> Arrays.stream(ReputationType.values()).map(f -> e.getValue().getReputation(f)).reduce(Integer::sum).orElse(0) != 0)
-                    .collect(Collectors.averagingInt(rep -> rep.getValue().getReputation(repType))); // Compute average
+                    .map(e -> e.getValue().getReputation(repType))
+                    .collect(Collectors.averagingInt(rep -> rep)); // Compute average
             averageReputation.setReputation(repType, (int) avgValue); // Store rounded average in the new Reputation object
         });
 
