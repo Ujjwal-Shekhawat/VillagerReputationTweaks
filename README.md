@@ -24,8 +24,8 @@ villager.
 
 ## Planned Enhancements:
 
-- [ ] Custom Permissions: Enable server admins to manage who can switch between different trade modes (Will require
+- [x] Custom Permissions: Enable server admins to manage who can switch between different trade modes (Will require
   permission management plugins).
 - [ ] Expanded Compatibility: Ensure support for Bukkit, Spigot, and Folia.
-- [ ] Add functions for effortless switching between trade modes.
+- [x] Add functions for effortless switching between trade modes.
 - [ ] Restrict the best trades per team (Not sure about this yet though)
